@@ -26,4 +26,24 @@ export class UsersService {
             },
         });
     }
+
+    findById(id: string) {
+        return this.prisma.user.findUnique({
+            where: { id },
+        });
+    }
+
+    updateRefreshTokenHash(id: string, refreshTokenHash: string) {
+        return this.prisma.user.update({
+            where: { id },
+            data: { refreshTokenHash },
+        });
+    }
+
+    clearRefreshToken(id: string) {
+        return this.prisma.user.update({
+            where: { id },
+            data: { refreshTokenHash: null },
+        });
+    }
 }

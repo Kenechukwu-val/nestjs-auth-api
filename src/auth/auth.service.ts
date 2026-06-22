@@ -9,6 +9,8 @@ import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { JwtPayload } from './types/jwt-payload.type';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -56,15 +58,13 @@ export class AuthService {
             role: user.role,
         };
 
-        const expiresIn = this.configService.getOrThrow<JwtSignOptions['expiresIn']>('JWT_ACCESS_EXPIRES_IN');
+        const tokens = await this.generateTokens(payload);
+        const refreshTokenHash = await bcrypt.hash(tokens.refreshToken, 10);
 
-        const accessToken = await this.jwtService.signAsync(payload, {
-            secret: this.configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
-            expiresIn,
-        });
+        await this.usersService.updateRefreshTokenHash(user.id, refreshTokenHash);
 
         return {
-            accessToken,
+            ...tokens,
             user: {
                 id: user.id,
                 email: user.email,
@@ -74,5 +74,72 @@ export class AuthService {
 
             },
         };
+    }
+
+    private async generateTokens(payload: JwtPayload) {
+        const accessExpiresIn = this.configService.getOrThrow<JwtSignOptions['expiresIn']>(
+            'JWT_ACCESS_EXPIRES_IN',
+        );
+
+        const refreshExpiresIn = this.configService.getOrThrow<JwtSignOptions['expiresIn']>(   
+            'JWT_REFRESH_EXPIRES_IN',
+        );
+
+        const [accessToken, refreshToken] = await Promise.all([
+                this.jwtService.signAsync(payload, {
+                secret: this.configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
+                expiresIn: accessExpiresIn,
+            }),
+                this.jwtService.signAsync(payload, {
+                secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
+                expiresIn: refreshExpiresIn,
+            }),
+        ]);
+
+        return { accessToken, refreshToken };
+    }
+
+    async refreshTokens(refreshTokenDto: RefreshTokenDto) {
+        const payload = await this.jwtService.verifyAsync<JwtPayload>(
+            refreshTokenDto.refreshToken,
+        {
+            secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
+        },
+    );
+
+    const user = await this.usersService.findById(payload.sub);
+
+    if (!user || !user.refreshTokenHash) {
+        throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const refreshTokenMatches = await bcrypt.compare(
+        refreshTokenDto.refreshToken,
+        user.refreshTokenHash,
+    );
+
+    if (!refreshTokenMatches) {
+        throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const tokens = await this.generateTokens({
+        sub: user.id,
+        email: user.email,
+        role: user.role,
+    });
+
+    const refreshTokenHash = await bcrypt.hash(tokens.refreshToken, 10);
+
+    await this.usersService.updateRefreshTokenHash(user.id, refreshTokenHash);
+
+        return tokens;
+    }
+
+    async logout(userId: string) {
+        await this.usersService.clearRefreshToken(userId);
+
+    return {
+        message: 'Logged out successfully',
+    };
     }
 }
