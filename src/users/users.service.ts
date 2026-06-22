@@ -46,4 +46,32 @@ export class UsersService {
             data: { refreshTokenHash: null },
         });
     }
+
+    updatePasswordResetToken(id: string, passwordResetToken: string, passwordResetExpires: Date, ) {
+        return this.prisma.user.update({
+            where: { id },
+            data: {
+                passwordResetToken,
+                passwordResetExpires
+            },
+        });
+    }
+
+    findByPasswordResetToken(passwordResetToken: string) {
+        return this.prisma.user.findFirst({
+            where: { passwordResetToken },
+        });
+    }
+
+    updatePassword(id: string, password: string) {
+        return this.prisma.user.update({
+            where: { id },
+            data: {
+                password,
+                passwordResetToken: null,
+                passwordResetExpires: null,
+                refreshTokenHash: null,
+            },
+        });
+    }
 }

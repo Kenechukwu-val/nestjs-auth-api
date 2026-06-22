@@ -8,6 +8,8 @@ import { Role } from '../../generated/prisma/enums.cjs';
 import { Roles } from './decorators/roles.decorator';
 import { RolesGuard } from './guards/roles.guard';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 type AuthenticatedRequest = Request & {
     user: {
@@ -55,5 +57,15 @@ export class AuthController {
     @Post('logout')
     logout(@Req() request: AuthenticatedRequest) {
         return this.authService.logout(request.user.id);
+    }
+
+    @Post('forgot-password')
+    forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+        return this.authService.forgotPassword(forgotPasswordDto);
+    }
+
+    @Post('reset-password')
+    resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+        return this.authService.resetPassword(resetPasswordDto);
     }
 }
