@@ -10,6 +10,7 @@ import { RolesGuard } from './guards/roles.guard';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 type AuthenticatedRequest = Request & {
     user: {
@@ -19,6 +20,7 @@ type AuthenticatedRequest = Request & {
     };
 };
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
@@ -33,12 +35,14 @@ export class AuthController {
         return this.authService.login(loginDto);
     }
 
+    @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     @Get('me')
     me(@Req() request: AuthenticatedRequest) {
         return request.user
     }
 
+    @ApiBearerAuth()
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN)
     @Get('admin')
@@ -53,6 +57,7 @@ export class AuthController {
         return this.authService.refreshTokens(refreshTokenDto);
     }
 
+    @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     @Post('logout')
     logout(@Req() request: AuthenticatedRequest) {
