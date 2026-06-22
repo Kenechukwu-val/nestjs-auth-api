@@ -15,7 +15,6 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { randomBytes, createHash } from 'crypto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { retry } from 'rxjs';
 
 @Injectable()
 export class AuthService {
