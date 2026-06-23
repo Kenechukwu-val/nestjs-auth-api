@@ -19,6 +19,7 @@ export class UsersService {
             select: {
                 id: true,
                 email: true,
+                emailVerified: true,
                 firstName: true,
                 lastName: true,
                 role: true,
@@ -73,5 +74,32 @@ export class UsersService {
                 refreshTokenHash: null,
             },
         });
+    }
+
+    updateEmailVerificationToken(id: string, emailVerificationToken: string, emailVerificationExpires: Date,) {
+        return this.prisma.user.update({
+            where: { id },
+            data: {
+                emailVerificationToken,
+                emailVerificationExpires,
+            },
+        });
+    }
+
+    findByEmailVerificationToken(emailVerificationToken: string) {
+        return this.prisma.user.findFirst({
+            where: { emailVerificationToken },
+        });
+    }
+
+    markEmailAsVerified(id: string) {
+        return this.prisma.user.update({
+            where: { id },
+            data: {
+                emailVerified: true,
+                emailVerificationToken: null,
+                emailVerificationExpires: null
+            }
+        })
     }
 }
