@@ -129,8 +129,19 @@ pnpm run test
 pnpm prisma studio
 ```
 
+## Testing
+
+This project includes automated tests for authentication flows and core backend behavior.
+
+### Run tests
+
+```bash
+pnpm run test
+
+```bash
+pnpm run test:e2e
+
 ## Future Improvements
 
 * Docker setup
-* Unit and integration tests
 * CI/CD deployment pipeline
