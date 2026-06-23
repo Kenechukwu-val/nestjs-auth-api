@@ -17,13 +17,15 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ResendVerificationEmailDto } from './dto/resend-verification-email.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly usersService: UsersService,
         private readonly jwtService: JwtService,
-        private readonly configService: ConfigService
+        private readonly configService: ConfigService,
+        private readonly mailService: MailService,
     ) {}
 
     async register(registerDto: RegisterDto) {
@@ -50,9 +52,10 @@ export class AuthService {
             emailVerificationExpires,
         );
 
+        await this.mailService.sendVerificationEmail(user.email, verificationToken);
+
         return {
             message: 'Registration successful. Please verify your email',
-            verificationToken,
             user,
         };
             
@@ -189,9 +192,10 @@ export class AuthService {
             passwordResetExpires,
         );
 
+        await this.mailService.sendPasswordResetEmail(user.email, resetToken);
+
         return {
             message: 'Password reset token generated',
-            resetToken,
         };
     }
 
@@ -262,9 +266,10 @@ export class AuthService {
             emailVerificationExpires,
         );
 
+        await this.mailService.sendVerificationEmail(user.email, verifcationToken);
+
         return {
             message: 'Verification token generated',
-            verifcationToken,
         };
     }
 }
