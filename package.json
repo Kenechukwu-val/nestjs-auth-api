@@ -17,7 +17,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "NODE_OPTIONS=--experimental-vm-modules jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -74,12 +74,26 @@
     "moduleFileExtensions": [
       "js",
       "json",
-      "ts"
+      "ts",
+      "cts"
     ],
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
+      "^.+\\.[cm]?[tj]s$": "ts-jest"
+    },
+    "moduleNameMapper": {
+      "^\\.\\./\\.\\./generated/prisma/(.*)\\.cjs$": "<rootDir>/../generated/prisma/$1.cts",
+      "^\\.\\./generated/prisma/(.*)\\.cjs$": "<rootDir>/../generated/prisma/$1.cts",
+      "^../../generated/prisma/(.*)\\.cjs$": "<rootDir>/../generated/prisma/$1.cts",
+      "^../generated/prisma/(.*)\\.cjs$": "<rootDir>/../generated/prisma/$1.cts",
+      "^\\./internal/(.*)\\.cjs$": "<rootDir>/../generated/prisma/internal/$1.cts",
+      "^\\.\\./internal/(.*)\\.cjs$": "<rootDir>/../generated/prisma/internal/$1.cts",
+      "^\\./models/(.*)\\.cjs$": "<rootDir>/../generated/prisma/models/$1.cts",
+      "^\\.\\./models/(.*)\\.cjs$": "<rootDir>/../generated/prisma/models/$1.cts",
+      "^\\./(class|prismaNamespace|prismaNamespaceBrowser)\\.cjs$": "<rootDir>/../generated/prisma/internal/$1.cts",
+      "^\\./(enums|models|commonInputTypes|client|browser)\\.cjs$": "<rootDir>/../generated/prisma/$1.cts",
+      "^\\.\\./(enums|models|commonInputTypes|client|browser)\\.cjs$": "<rootDir>/../generated/prisma/$1.cts"
     },
     "collectCoverageFrom": [
       "**/*.(t|j)s"
