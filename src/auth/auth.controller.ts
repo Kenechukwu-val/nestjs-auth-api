@@ -12,6 +12,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ResendVerificationEmailDto } from './dto/resend-verification-email.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
+import { Throttle } from '@nestjs/throttler';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 type AuthenticatedRequest = Request & {
@@ -27,11 +28,13 @@ type AuthenticatedRequest = Request & {
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
+    @Throttle({ default: { limit: 5, ttl: 60 } })
     @Post('register')
     register(@Body() registerDto: RegisterDto) {
         return this.authService.register(registerDto);
     }
 
+    @Throttle({ default: { limit: 5, ttl: 60} })
     @Post('login')
     login(@Body() loginDto: LoginDto) {
         return this.authService.login(loginDto);
@@ -66,6 +69,7 @@ export class AuthController {
         return this.authService.logout(request.user.id);
     }
 
+    @Throttle({ default: { limit: 3, ttl: 60 } })
     @Post('forgot-password')
     forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
         return this.authService.forgotPassword(forgotPasswordDto);
@@ -81,6 +85,7 @@ export class AuthController {
         return this.authService.verifyEmail(verifyEmailDto);
     }
 
+    @Throttle({ default: { limit: 3, ttl: 60 } })
     @Post('resend-verification-email')
     resendVerificationEmail(
     @Body() resendVerificationEmailDto: ResendVerificationEmailDto,
