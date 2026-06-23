@@ -58,6 +58,14 @@ JWT_ACCESS_SECRET="change-this-access-secret"
 JWT_REFRESH_SECRET="change-this-refresh-secret"
 JWT_ACCESS_EXPIRES_IN="15m"
 JWT_REFRESH_EXPIRES_IN="7d"
+
+APP_URL="http://localhost:3000"
+
+SMTP_HOST=
+SMTP_PORT=587
+SMTP_USER=
+SMTP_PASS=
+MAIL_FROM="Auth API <no-reply@example.com>"
 ```
 
 ### 4. Run database migration
@@ -98,6 +106,8 @@ http://localhost:3000/docs
 | GET    | `/auth/admin`           | Admin-only protected route                   |
 | POST   | `/auth/forgot-password` | Generate password reset token                |
 | POST   | `/auth/reset-password`  | Reset user password                          |
+| POST   | `/auth/verify-email`                               | Verify user email |
+| POST   | `/auth/resend-verification-email`          | Resend verification email |
 
 ## Security Features
 
@@ -118,9 +128,6 @@ pnpm prisma studio
 
 ## Future Improvements
 
-* Email verification
-* Email delivery for password reset links
-* Rate limiting for authentication routes
 * Docker setup
 * Unit and integration tests
 * CI/CD deployment pipeline
