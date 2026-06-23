@@ -3,6 +3,7 @@ import {
     Injectable,
     UnauthorizedException,
     BadRequestException,
+    Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService, type JwtSignOptions } from '@nestjs/jwt';
@@ -21,6 +22,8 @@ import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class AuthService {
+    private readonly logger = new Logger(AuthService.name);
+
     constructor(
         private readonly usersService: UsersService,
         private readonly jwtService: JwtService,
@@ -52,10 +55,17 @@ export class AuthService {
             emailVerificationExpires,
         );
 
-        await this.mailService.sendVerificationEmail(user.email, verificationToken);
+        try {
+            await this.mailService.sendVerificationEmail(user.email, verificationToken);
+        } catch (error) {
+            this.logger.error(
+                `Failed to send verification email to ${user.email}`,
+                error instanceof Error ? error.stack : String(error),
+            )
+        }
 
         return {
-            message: 'Registration successful. Please verify your email',
+            message: 'Registration successful. Please check your email to verify your account',
             user,
         };
             
@@ -190,7 +200,14 @@ export class AuthService {
             passwordResetExpires,
         );
 
-        await this.mailService.sendPasswordResetEmail(user.email, resetToken);
+        try {
+            await this.mailService.sendPasswordResetEmail(user.email, resetToken);
+        } catch (error) {
+            this.logger.error(
+                `Failed to send password reset email to ${user.email}`,
+                error instanceof Error ? error.stack : String(error),
+            )
+        }
 
         return {
             message: 'If that email exists, a password reset link has been sent',
@@ -264,7 +281,14 @@ export class AuthService {
             emailVerificationExpires,
         );
 
-        await this.mailService.sendVerificationEmail(user.email, verificationToken);
+        try {
+            await this.mailService.sendVerificationEmail(user.email, verificationToken);
+        } catch (error) {
+            this.logger.error(
+                `Failed to send verification email to ${user.email}`,
+                error instanceof Error ? error.stack : String(error),
+            )
+        }
 
         return {
             message: 'Verification token generated',
