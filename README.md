@@ -137,8 +137,8 @@ This project includes automated tests for authentication flows and core backend 
 
 ```bash
 pnpm run test
-
 pnpm run test:e2e
+```
 
 ## Future Improvements
 
