@@ -1,10 +1,10 @@
 # NestJS Auth API
 
-A secure authentication and authorization API built with NestJS, TypeScript, PostgreSQL, Prisma, JWT, bcrypt, refresh token rotation, role-based access control, password reset flow, and Swagger documentation.
+Built a secure production-style authentication API using NestJS, TypeScript, PostgreSQL, Prisma, JWT, bcrypt, refresh token rotation, role-based access control, email verification, password reset email delivery, rate limiting, and Swagger documentation.
 
 ## Project Purpose
 
-This project demonstrates a production-style backend authentication system for modern web applications. It includes user registration, login, protected routes, role-based authorization, refresh token handling, and password reset functionality.
+This project demonstrates a production-style backend authentication system for modern web applications. It includes user registration, login, protected routes, role-based authorization, refresh token handling, email delivery, request per minutes and password reset functionality.
 
 ## Features
 
@@ -17,7 +17,8 @@ This project demonstrates a production-style backend authentication system for m
 * Protected routes
 * Authenticated user profile route
 * Admin-only route
-* Password reset token flow
+* Password reset with email delivery
+* Rate limiting for authentic routes
 * Swagger API documentation
 * PostgreSQL database integration with Prisma
 
@@ -30,6 +31,8 @@ This project demonstrates a production-style backend authentication system for m
 * JWT
 * bcrypt
 * Swagger
+* Nodemailer
+* Throttler
 * pnpm
 
 ## Getting Started
@@ -104,7 +107,7 @@ http://localhost:3000/docs
 | POST   | `/auth/logout`          | Logout current user                          |
 | GET    | `/auth/me`              | Get authenticated user profile               |
 | GET    | `/auth/admin`           | Admin-only protected route                   |
-| POST   | `/auth/forgot-password` | Generate password reset email                |
+| POST   | `/auth/forgot-password` | Send password reset email                |
 | POST   | `/auth/reset-password`  | Reset user password                          |
 | POST   | `/auth/verify-email`                               | Verify user email |
 | POST   | `/auth/resend-verification-email`          | Resend verification email |
