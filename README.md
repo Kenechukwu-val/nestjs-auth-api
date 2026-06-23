@@ -104,7 +104,7 @@ http://localhost:3000/docs
 | POST   | `/auth/logout`          | Logout current user                          |
 | GET    | `/auth/me`              | Get authenticated user profile               |
 | GET    | `/auth/admin`           | Admin-only protected route                   |
-| POST   | `/auth/forgot-password` | Generate password reset token                |
+| POST   | `/auth/forgot-password` | Generate password reset email                |
 | POST   | `/auth/reset-password`  | Reset user password                          |
 | POST   | `/auth/verify-email`                               | Verify user email |
 | POST   | `/auth/resend-verification-email`          | Resend verification email |
