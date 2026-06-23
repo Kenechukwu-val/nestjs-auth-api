@@ -253,12 +253,12 @@ export class AuthService {
         }
 
         const verifcationToken = this.generateRawToken();
-        const emailverificationToken = this.hashToken(verifcationToken);
+        const emailVerificationToken = this.hashToken(verifcationToken);
         const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
         await this.usersService.updateEmailVerificationToken(
             user.id,
-            emailverificationToken,
+            emailVerificationToken,
             emailVerificationExpires,
         );
 
