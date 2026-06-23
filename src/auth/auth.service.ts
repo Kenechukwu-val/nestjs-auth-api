@@ -12,7 +12,7 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { JwtPayload } from './types/jwt-payload.type';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { randomBytes, createHash } from 'crypto';
+import { randomBytes, createHash, randomUUID } from 'crypto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ResendVerificationEmailDto } from './dto/resend-verification-email.dto';
@@ -88,7 +88,7 @@ export class AuthService {
         };
 
         const tokens = await this.generateTokens(payload);
-        const refreshTokenHash = await bcrypt.hash(tokens.refreshToken, 10);
+        const refreshTokenHash = this.hashToken(tokens.refreshToken);
 
         await this.usersService.updateRefreshTokenHash(user.id, refreshTokenHash);
 
@@ -119,7 +119,7 @@ export class AuthService {
                 secret: this.configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
                 expiresIn: accessExpiresIn,
             }),
-                this.jwtService.signAsync(payload, {
+                this.jwtService.signAsync({ ...payload, jti: randomUUID() }, {
                 secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
                 expiresIn: refreshExpiresIn,
             }),
@@ -142,10 +142,8 @@ export class AuthService {
         throw new UnauthorizedException('Invalid refresh token');
     }
 
-    const refreshTokenMatches = await bcrypt.compare(
-        refreshTokenDto.refreshToken,
-        user.refreshTokenHash,
-    );
+    const refreshTokenMatches =
+        this.hashToken(refreshTokenDto.refreshToken) === user.refreshTokenHash;
 
     if (!refreshTokenMatches) {
         throw new UnauthorizedException('Invalid refresh token');
@@ -157,7 +155,7 @@ export class AuthService {
         role: user.role,
     });
 
-    const refreshTokenHash = await bcrypt.hash(tokens.refreshToken, 10);
+    const refreshTokenHash = this.hashToken(tokens.refreshToken);
 
     await this.usersService.updateRefreshTokenHash(user.id, refreshTokenHash);
 

@@ -1,9 +1,22 @@
 {
-  "moduleFileExtensions": ["js", "json", "ts"],
+  "moduleFileExtensions": ["js", "json", "ts", "cts"],
   "rootDir": ".",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
+  "moduleNameMapper": {
+    "^\\.\\./\\.\\./generated/prisma/(.*)\\.cjs$": "<rootDir>/../generated/prisma/$1.cts",
+    "^\\.\\./generated/prisma/(.*)\\.cjs$": "<rootDir>/../generated/prisma/$1.cts",
+    "^../../generated/prisma/(.*)\\.cjs$": "<rootDir>/../generated/prisma/$1.cts",
+    "^../generated/prisma/(.*)\\.cjs$": "<rootDir>/../generated/prisma/$1.cts",
+    "^\\./internal/(.*)\\.cjs$": "<rootDir>/../generated/prisma/internal/$1.cts",
+    "^\\.\\./internal/(.*)\\.cjs$": "<rootDir>/../generated/prisma/internal/$1.cts",
+    "^\\./models/(.*)\\.cjs$": "<rootDir>/../generated/prisma/models/$1.cts",
+    "^\\.\\./models/(.*)\\.cjs$": "<rootDir>/../generated/prisma/models/$1.cts",
+    "^\\./(class|prismaNamespace|prismaNamespaceBrowser)\\.cjs$": "<rootDir>/../generated/prisma/internal/$1.cts",
+    "^\\./(enums|models|commonInputTypes|client|browser)\\.cjs$": "<rootDir>/../generated/prisma/$1.cts",
+    "^\\.\\./(enums|models|commonInputTypes|client|browser)\\.cjs$": "<rootDir>/../generated/prisma/$1.cts"
+  },
   "transform": {
-    "^.+\\.(t|j)s$": "ts-jest"
+    "^.+\\.[cm]?[tj]s$": "ts-jest"
   }
 }
