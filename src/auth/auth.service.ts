@@ -15,6 +15,8 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { randomBytes, createHash } from 'crypto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ResendVerificationEmailDto } from './dto/resend-verification-email.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
 
 @Injectable()
 export class AuthService {
@@ -33,10 +35,26 @@ export class AuthService {
 
         const passwordHash = await bcrypt.hash(registerDto.password, 10);
 
-        return this.usersService.create({
+        const user = await this.usersService.create({
             ...registerDto,
             password: passwordHash
-        })
+        });
+
+        const verificationToken = this.generateRawToken();
+        const emailVerificationToken = this.hashToken(verificationToken);
+        const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+        await this.usersService.updateEmailVerificationToken(
+            user.id,
+            emailVerificationToken,
+            emailVerificationExpires,
+        );
+
+        return {
+            message: 'Registration successful. Please verify your email',
+            verificationToken,
+            user,
+        };
             
     }
 
@@ -45,6 +63,10 @@ export class AuthService {
 
         if (!user) {
             throw new UnauthorizedException('Invalid credentials');
+        }
+
+        if (!user.emailVerified) {
+            throw new UnauthorizedException('Please verify your email before logging in');
         }
 
         const passwordMatches = await bcrypt.compare(
@@ -190,6 +212,59 @@ export class AuthService {
 
         return {
             message: 'Password reset successfully',
+        };
+    }
+
+    private generateRawToken() {
+        return randomBytes(32).toString('hex');
+    }
+
+    private hashToken(token: string) {
+        return createHash('sha256').update(token).digest('hex');
+    }
+
+    async verifyEmail(verifyEmailDto: VerifyEmailDto) {
+        const emailVerificationToken = this.hashToken(verifyEmailDto.token);
+
+        const user = await this.usersService.findByEmailVerificationToken(
+            emailVerificationToken,
+        );
+
+        if (!user || !user.emailVerificationExpires || user.emailVerificationExpires < new Date()) {
+            throw new BadRequestException('Invalid or expired verification token');
+        }
+
+        await this.usersService.markEmailAsVerified(user.id);
+
+        return {
+            message: 'Email verified successfully',
+        };
+    }
+
+    async resendVerificationEmail(resendVerificationEmailDto: ResendVerificationEmailDto) {
+        const user = await this.usersService.findByEmail(
+            resendVerificationEmailDto.email,
+        );
+
+        if (!user || user.emailVerified) {
+            return {
+                message: 'If verification is needed, a verification email has been sent'
+            };
+        }
+
+        const verifcationToken = this.generateRawToken();
+        const emailverificationToken = this.hashToken(verifcationToken);
+        const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+        await this.usersService.updateEmailVerificationToken(
+            user.id,
+            emailverificationToken,
+            emailVerificationExpires,
+        );
+
+        return {
+            message: 'Verification token generated',
+            verifcationToken,
         };
     }
 }

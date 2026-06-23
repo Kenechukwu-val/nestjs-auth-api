@@ -10,6 +10,8 @@ import { RolesGuard } from './guards/roles.guard';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ResendVerificationEmailDto } from './dto/resend-verification-email.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 type AuthenticatedRequest = Request & {
@@ -72,5 +74,17 @@ export class AuthController {
     @Post('reset-password')
     resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
         return this.authService.resetPassword(resetPasswordDto);
+    }
+
+    @Post('verify-email')
+    verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
+        return this.authService.verifyEmail(verifyEmailDto);
+    }
+
+    @Post('resend-verification-email')
+    resendVerificationEmail(
+    @Body() resendVerificationEmailDto: ResendVerificationEmailDto,
+    ) {
+        return this.authService.resendVerificationEmail(resendVerificationEmailDto);
     }
 }
