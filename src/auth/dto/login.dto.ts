@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsEmail, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsString, IsNotEmpty } from 'class-validator';
 
 export class LoginDto {
   @ApiProperty({ example: 'test@example.com' })
@@ -10,10 +10,6 @@ export class LoginDto {
 
   @ApiProperty({ example: 'Password123' })
   @IsString()
-  @MinLength(8)
-  @MaxLength(72)
-  @Matches(/^\S+$/, {
-    message: 'password must not contain spaces',
-  })
-  password: string;
+  @IsNotEmpty({ message: 'password should not be empty' })
+  password: string; // Removed length and space restrictions
 }
