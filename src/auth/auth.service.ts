@@ -195,7 +195,7 @@ export class AuthService {
         await this.mailService.sendPasswordResetEmail(user.email, resetToken);
 
         return {
-            message: 'Password reset token generated',
+            message: 'If that email exists, a password reset link has been sent',
         };
     }
 
@@ -256,8 +256,8 @@ export class AuthService {
             };
         }
 
-        const verifcationToken = this.generateRawToken();
-        const emailVerificationToken = this.hashToken(verifcationToken);
+        const verificationToken = this.generateRawToken();
+        const emailVerificationToken = this.hashToken(verificationToken);
         const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
         await this.usersService.updateEmailVerificationToken(
@@ -266,7 +266,7 @@ export class AuthService {
             emailVerificationExpires,
         );
 
-        await this.mailService.sendVerificationEmail(user.email, verifcationToken);
+        await this.mailService.sendVerificationEmail(user.email, verificationToken);
 
         return {
             message: 'Verification token generated',
