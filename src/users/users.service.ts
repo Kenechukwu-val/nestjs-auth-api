@@ -4,7 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   findByEmail(email: string) {
     return this.prisma.user.findUnique({
@@ -12,7 +12,7 @@ export class UsersService {
     });
   }
 
-  create(data: CreateUserDto & { password: string }) {
+  create(data: CreateUserDto & { password: string; emailVerificationToken?: string; emailVerificationExpires?: Date; }) {
     return this.prisma.user.create({
       data,
       select: {

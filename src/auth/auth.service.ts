@@ -40,20 +40,16 @@ export class AuthService {
 
         const passwordHash = await bcrypt.hash(registerDto.password, 10);
 
-        const user = await this.usersService.create({
-            ...registerDto,
-            password: passwordHash,
-        });
-
         const verificationToken = this.generateRawToken();
         const emailVerificationToken = this.hashToken(verificationToken);
         const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-        await this.usersService.updateEmailVerificationToken(
-            user.id,
+        const user = await this.usersService.create({
+            ...registerDto,
+            password: passwordHash,
             emailVerificationToken,
             emailVerificationExpires,
-        );
+        });
 
         try {
             await this.mailService.sendVerificationEmail(
