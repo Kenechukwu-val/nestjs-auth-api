@@ -29,7 +29,7 @@ export class AuthService {
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
         private readonly mailService: MailService,
-    ) {}
+    ) { }
 
     async register(registerDto: RegisterDto) {
         const existingUser = await this.usersService.findByEmail(registerDto.email);
@@ -68,7 +68,7 @@ export class AuthService {
             message: 'Registration successful. Please check your email to verify your account',
             user,
         };
-            
+
     }
 
     async login(loginDto: LoginDto) {
@@ -120,16 +120,16 @@ export class AuthService {
             'JWT_ACCESS_EXPIRES_IN',
         );
 
-        const refreshExpiresIn = this.configService.getOrThrow<JwtSignOptions['expiresIn']>(   
+        const refreshExpiresIn = this.configService.getOrThrow<JwtSignOptions['expiresIn']>(
             'JWT_REFRESH_EXPIRES_IN',
         );
 
         const [accessToken, refreshToken] = await Promise.all([
-                this.jwtService.signAsync(payload, {
+            this.jwtService.signAsync(payload, {
                 secret: this.configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
                 expiresIn: accessExpiresIn,
             }),
-                this.jwtService.signAsync({ ...payload, jti: randomUUID() }, {
+            this.jwtService.signAsync({ ...payload, jti: randomUUID() }, {
                 secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
                 expiresIn: refreshExpiresIn,
             }),
@@ -141,33 +141,33 @@ export class AuthService {
     async refreshTokens(refreshTokenDto: RefreshTokenDto) {
         const payload = await this.jwtService.verifyAsync<JwtPayload>(
             refreshTokenDto.refreshToken,
-        {
-            secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
-        },
-    );
+            {
+                secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
+            },
+        );
 
-    const user = await this.usersService.findById(payload.sub);
+        const user = await this.usersService.findById(payload.sub);
 
-    if (!user || !user.refreshTokenHash) {
-        throw new UnauthorizedException('Invalid refresh token');
-    }
+        if (!user || !user.refreshTokenHash) {
+            throw new UnauthorizedException('Invalid refresh token');
+        }
 
-    const refreshTokenMatches =
-        this.hashToken(refreshTokenDto.refreshToken) === user.refreshTokenHash;
+        const refreshTokenMatches =
+            this.hashToken(refreshTokenDto.refreshToken) === user.refreshTokenHash;
 
-    if (!refreshTokenMatches) {
-        throw new UnauthorizedException('Invalid refresh token');
-    }
+        if (!refreshTokenMatches) {
+            throw new UnauthorizedException('Invalid refresh token');
+        }
 
-    const tokens = await this.generateTokens({
-        sub: user.id,
-        email: user.email,
-        role: user.role,
-    });
+        const tokens = await this.generateTokens({
+            sub: user.id,
+            email: user.email,
+            role: user.role,
+        });
 
-    const refreshTokenHash = this.hashToken(tokens.refreshToken);
+        const refreshTokenHash = this.hashToken(tokens.refreshToken);
 
-    await this.usersService.updateRefreshTokenHash(user.id, refreshTokenHash);
+        await this.usersService.updateRefreshTokenHash(user.id, refreshTokenHash);
 
         return tokens;
     }
@@ -175,9 +175,9 @@ export class AuthService {
     async logout(userId: string) {
         await this.usersService.clearRefreshToken(userId);
 
-    return {
-        message: 'Logged out successfully',
-    };
+        return {
+            message: 'Logged out successfully',
+        };
     }
 
     async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
@@ -192,7 +192,7 @@ export class AuthService {
         const resetToken = randomBytes(32).toString('hex');
         const passwordResetToken = createHash('sha256').update(resetToken).digest('hex');
 
-        const passwordResetExpires = new Date(Date.now() + 15 * 60 * 1000 );
+        const passwordResetExpires = new Date(Date.now() + 15 * 60 * 1000);
 
         await this.usersService.updatePasswordResetToken(
             user.id,
