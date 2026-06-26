@@ -143,12 +143,17 @@ export class AuthService {
     }
 
     async refreshTokens(refreshTokenDto: RefreshTokenDto) {
-        const payload = await this.jwtService.verifyAsync<JwtPayload>(
-            refreshTokenDto.refreshToken,
-            {
-                secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
-            },
-        );
+        let payload: JwtPayload;
+        try {
+            payload = await this.jwtService.verifyAsync<JwtPayload>(
+                refreshTokenDto.refreshToken,
+                {
+                    secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
+                },
+            );
+        } catch (error) {
+            throw new UnauthorizedException('Invalid refresh token');
+        }
 
         const user = await this.usersService.findById(payload.sub);
 
