@@ -80,7 +80,9 @@ describe('Auth flows (e2e)', () => {
 
   const latestPasswordResetToken = (email: string) => {
     const mail = sentMail
-      .filter((entry) => entry.type === 'passwordReset' && entry.email === email)
+      .filter(
+        (entry) => entry.type === 'passwordReset' && entry.email === email,
+      )
       .at(-1);
 
     if (!mail) {
@@ -125,11 +127,13 @@ describe('Auth flows (e2e)', () => {
   beforeEach(async () => {
     sentMail = [];
     mailServiceMock = {
-      sendVerificationEmail: jest.fn(async (email: string, token: string) => {
+      sendVerificationEmail: jest.fn((email: string, token: string) => {
         sentMail.push({ type: 'verification', email, token });
+        return Promise.resolve();
       }),
-      sendPasswordResetEmail: jest.fn(async (email: string, token: string) => {
+      sendPasswordResetEmail: jest.fn((email: string, token: string) => {
         sentMail.push({ type: 'passwordReset', email, token });
+        return Promise.resolve();
       }),
     };
 
@@ -217,9 +221,14 @@ describe('Auth flows (e2e)', () => {
       .send({ email, password })
       .expect(201);
 
-    expect(response.body.accessToken).toEqual(expect.any(String));
-    expect(response.body.refreshToken).toEqual(expect.any(String));
-    expect(response.body.user.email).toBe(email);
+    const body = response.body as {
+      accessToken: string;
+      refreshToken: string;
+      user: { email: string };
+    };
+    expect(body.accessToken).toEqual(expect.any(String));
+    expect(body.refreshToken).toEqual(expect.any(String));
+    expect(body.user.email).toBe(email);
   });
 
   it('sends a password reset email and prevents old reset token reuse', async () => {
@@ -326,7 +335,8 @@ describe('Auth flows (e2e)', () => {
       .get('/docs-json')
       .expect(200);
 
-    expect(Object.keys(response.body.paths)).toEqual(
+    const body = response.body as { paths: Record<string, unknown> };
+    expect(Object.keys(body.paths)).toEqual(
       expect.arrayContaining([
         '/auth/register',
         '/auth/login',

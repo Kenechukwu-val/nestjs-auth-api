@@ -9,12 +9,12 @@ export function IsSecurePassword() {
     MinLength(8),
     MaxLength(72),
     // 3. Block any whitespace characters
-    Matches(/^\S+$/, { 
-      message: 'password must not contain spaces' 
+    Matches(/^\S+$/, {
+      message: 'password must not contain spaces',
     }),
     // 4. Enforce complexity (at least one letter and one number)
     Matches(/^(?=.*[A-Za-z])(?=.*\d).+$/, {
       message: 'password must contain at least one letter and one number',
-    })
+    }),
   );
 }

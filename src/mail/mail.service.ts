@@ -36,13 +36,16 @@ export class MailService {
     });
 
     await transporter.sendMail({
-      from: this.configService.get<string>('MAIL_FROM') ?? 'Auth API <no-reply@example.com>',
+      from:
+        this.configService.get<string>('MAIL_FROM') ??
+        'Auth API <no-reply@example.com>',
       ...options,
     });
   }
 
   async sendVerificationEmail(email: string, token: string) {
-    const appUrl = this.configService.get<string>('APP_URL') ?? 'http://localhost:3000';
+    const appUrl =
+      this.configService.get<string>('APP_URL') ?? 'http://localhost:3000';
     const verificationLink = `${appUrl}/verify-email?token=${token}`;
 
     await this.sendMail({
@@ -58,7 +61,8 @@ export class MailService {
   }
 
   async sendPasswordResetEmail(email: string, token: string) {
-    const appUrl = this.configService.get<string>('APP_URL') ?? 'http://localhost:3000';
+    const appUrl =
+      this.configService.get<string>('APP_URL') ?? 'http://localhost:3000';
     const resetLink = `${appUrl}/reset-password?token=${token}`;
 
     await this.sendMail({

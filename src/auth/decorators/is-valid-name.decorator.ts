@@ -5,7 +5,7 @@ import { IsString, MaxLength, Matches } from 'class-validator';
 export function IsValidName() {
   return applyDecorators(
     // 1. Clean up whitespaces automatically
-    Transform(({ value }) => {
+    Transform(({ value }: { value: unknown }) => {
       if (typeof value !== 'string') return value;
       return value.trim();
     }),
@@ -16,6 +16,6 @@ export function IsValidName() {
     // 4. Validate layout allowing letters, inner hyphens, and apostrophes
     Matches(/^[A-Za-z]+(?:['-][A-Za-z]+)*$/, {
       message: 'name must contain only letters, hyphens, or apostrophes',
-    })
+    }),
   );
 }

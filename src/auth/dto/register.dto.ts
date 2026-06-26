@@ -4,7 +4,6 @@ import { IsSanitizedEmail } from '../decorators/is-sanitized-email.decorator';
 import { IsSecurePassword } from '../decorators/is-secure-password.decorator';
 import { IsValidName } from '../decorators/is-valid-name.decorator';
 
-
 export class RegisterDto {
   @ApiProperty({ example: 'example@test.com' })
   @IsSanitizedEmail()
